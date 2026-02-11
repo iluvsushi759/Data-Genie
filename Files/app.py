@@ -1,3 +1,6 @@
+st.write("Loaded key:", st.secrets["OPENAI_API_KEY"])
+
+
 import streamlit as st
 
 # Simple authentication gate
