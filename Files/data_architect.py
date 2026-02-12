@@ -25,14 +25,14 @@ if not st.session_state.authenticated:
 st.set_page_config(page_title="Architecture Strategy Simulator", page_icon="🏗")
 
 # ============================================================
-# 🎨 CUSTOM PROFESSIONAL DARK UI (BRIGHT TEXT UNIFIED)
+# 🎨 CUSTOM PROFESSIONAL DARK UI (BRIGHT TEXT + FIXED DROPDOWNS)
 # ============================================================
 
 st.markdown("""
 <style>
 
 [data-testid="stAppViewContainer"] {
-    background-color: #1b1f28; /* slightly lighter dark background */
+    background-color: #1b1f28; /* app background */
 }
 
 .block-container {
@@ -40,22 +40,22 @@ st.markdown("""
     max-width: 1100px;
 }
 
-/* Headers and text unified color */
-h1, h2, h3, p, sub, label, .stMarkdown, .stTextInput>div>div>input, .stSelectbox>div>div>div {
-    color: #f5f7fa !important; /* bright, crisp, same as main tagline */
+/* Unified bright text */
+h1, h2, h3, p, sub, label {
+    color: #f5f7fa !important; /* bright white */
     font-weight: 500;
 }
 
-/* Simulation / card containers */
+/* Card styling */
 .sim-card {
-    background-color: #272b36; /* slightly lighter dark for contrast */
+    background-color: #272b36; /* card background */
     padding: 25px;
     border-radius: 12px;
     border: 1px solid #3b3f4d;
     margin-bottom: 25px;
 }
 
-/* Section headers within cards */
+/* Section headers inside cards */
 .sim-card h3 {
     border-bottom: 2px solid #2ea043;
     padding-bottom: 5px;
@@ -85,6 +85,34 @@ h1, h2, h3, p, sub, label, .stMarkdown, .stTextInput>div>div>input, .stSelectbox
 /* Chat messages spacing */
 [data-testid="stChatMessage"] {
     margin-bottom: 15px;
+}
+
+/* ======================
+   Selectbox / Dropdown
+   ====================== */
+
+/* Container text (selected value) */
+div.stSelectbox>div>div>div>div {
+    color: #f5f7fa !important;  /* bright white */
+}
+
+/* Dropdown options */
+div[role="listbox"] div[role="option"] {
+    background-color: #272b36 !important; /* dark card background */
+    color: #f5f7fa !important; /* readable text */
+}
+
+/* Hover effect in dropdown options */
+div[role="listbox"] div[role="option"]:hover {
+    background-color: #2ea043 !important; /* highlight on hover */
+    color: #ffffff !important;
+}
+
+/* Input text fields */
+div.stTextInput>div>div>input {
+    color: #f5f7fa !important;
+    background-color: #272b36 !important;
+    border: 1px solid #3b3f4d;
 }
 
 </style>
