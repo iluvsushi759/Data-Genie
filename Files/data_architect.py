@@ -25,7 +25,7 @@ if not st.session_state.authenticated:
 st.set_page_config(page_title="Architecture Strategy Simulator", page_icon="🏗")
 
 # ============================================================
-# 🎨 CUSTOM PROFESSIONAL DARK UI
+# 🎨 CUSTOM PROFESSIONAL DARK UI (FIXED COLORS)
 # ============================================================
 
 st.markdown("""
@@ -40,18 +40,33 @@ st.markdown("""
     max-width: 1100px;
 }
 
+/* Headers */
 h1, h2, h3 {
-    color: #E6EDF3;
+    color: #ffffff; /* bright white for titles */
 }
 
+/* Paragraphs, labels, subheaders inside cards */
+.sim-card p, .sim-card sub, .sim-card label {
+    color: #cbd5e1; /* light grey for readability */
+}
+
+/* Simulation / card containers */
 .sim-card {
-    background-color: #161b22;
+    background-color: #1f2229; /* slightly lighter than before */
     padding: 25px;
     border-radius: 12px;
     border: 1px solid #30363d;
     margin-bottom: 25px;
 }
 
+/* Section headers within cards */
+.sim-card h3 {
+    border-bottom: 2px solid #238636;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+/* Buttons */
 .stButton>button {
     background-color: #238636;
     color: white;
@@ -65,11 +80,13 @@ h1, h2, h3 {
     background-color: #2ea043;
 }
 
+/* Info boxes */
 [data-testid="stInfo"] {
     background-color: #1f2937;
     border: 1px solid #374151;
 }
 
+/* Chat messages spacing */
 [data-testid="stChatMessage"] {
     margin-bottom: 15px;
 }
@@ -84,7 +101,7 @@ h1, h2, h3 {
 st.markdown("""
 <div class="sim-card">
     <h1>🏗 Architecture Strategy Simulator</h1>
-    <p style="color:#9da5b4;">
+    <p style="color:#cbd5e1;">
     Think like a Senior Data Architect. Design. Defend. Optimize.
     </p>
 </div>
@@ -159,7 +176,7 @@ if (st.session_state.setup_complete
     st.markdown("""
     <div class="sim-card">
         <h3>🎯 Simulation Active</h3>
-        <p style="color:#9da5b4;">
+        <p>
         You are the Data Architect. The AI is the CTO challenging your design.
         Consider scalability, cost, governance, and ML readiness.
         </p>
