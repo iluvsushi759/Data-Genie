@@ -25,14 +25,14 @@ if not st.session_state.authenticated:
 st.set_page_config(page_title="Architecture Strategy Simulator", page_icon="🏗")
 
 # ============================================================
-# 🎨 CUSTOM PROFESSIONAL DARK UI (FIXED COLORS)
+# 🎨 CUSTOM PROFESSIONAL DARK UI (BRIGHTER VERSION)
 # ============================================================
 
 st.markdown("""
 <style>
 
 [data-testid="stAppViewContainer"] {
-    background-color: #0e1117;
+    background-color: #181c24; /* slightly lighter dark */
 }
 
 .block-container {
@@ -42,26 +42,28 @@ st.markdown("""
 
 /* Headers */
 h1, h2, h3 {
-    color: #ffffff; /* bright white for titles */
+    color: #f5f7fa; /* brighter white for titles */
+    font-weight: 700;
 }
 
 /* Paragraphs, labels, subheaders inside cards */
 .sim-card p, .sim-card sub, .sim-card label {
-    color: #cbd5e1; /* light grey for readability */
+    color: #e0e6f0; /* light grey/white for readability */
+    font-weight: 500;
 }
 
 /* Simulation / card containers */
 .sim-card {
-    background-color: #1f2229; /* slightly lighter than before */
+    background-color: #262b38; /* lighter dark, easy on eyes */
     padding: 25px;
     border-radius: 12px;
-    border: 1px solid #30363d;
+    border: 1px solid #3a3f4d;
     margin-bottom: 25px;
 }
 
 /* Section headers within cards */
 .sim-card h3 {
-    border-bottom: 2px solid #238636;
+    border-bottom: 2px solid #2ea043;
     padding-bottom: 5px;
     margin-bottom: 15px;
 }
@@ -69,7 +71,7 @@ h1, h2, h3 {
 /* Buttons */
 .stButton>button {
     background-color: #238636;
-    color: white;
+    color: #ffffff;
     border-radius: 8px;
     padding: 10px 20px;
     font-weight: 600;
@@ -82,8 +84,8 @@ h1, h2, h3 {
 
 /* Info boxes */
 [data-testid="stInfo"] {
-    background-color: #1f2937;
-    border: 1px solid #374151;
+    background-color: #2b303a;
+    border: 1px solid #3a3f4d;
 }
 
 /* Chat messages spacing */
@@ -101,7 +103,7 @@ h1, h2, h3 {
 st.markdown("""
 <div class="sim-card">
     <h1>🏗 Architecture Strategy Simulator</h1>
-    <p style="color:#cbd5e1;">
+    <p>
     Think like a Senior Data Architect. Design. Defend. Optimize.
     </p>
 </div>
