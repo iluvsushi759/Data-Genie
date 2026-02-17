@@ -2,6 +2,9 @@ import streamlit as st
 from openai import OpenAI
 from streamlit_js_eval import streamlit_js_eval
 
+# Initialize session state keys if they don't exist
+if 'setup_complete' not in st.session_state:
+    st.session_state.setup_complete = False
 
 # ============================================================
 # ⚙ SETUP PHASE
