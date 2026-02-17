@@ -2,6 +2,23 @@ import streamlit as st
 from openai import OpenAI
 from streamlit_js_eval import streamlit_js_eval
 
+# ===============================
+# Initialize session state keys
+# ===============================
+session_keys_defaults = {
+    "setup_complete": False,
+    "chat_complete": False,
+    "feedback_shown": False,
+    "evaluation_mode": False,
+    "user_input": "",
+    "model_loaded": False,
+    "messages": []
+}
+
+for key, default_value in session_keys_defaults.items():
+    if key not in st.session_state:
+        st.session_state[key] = default_value
+
 # ============================================================
 # 🔐 PASSWORD PROTECTION
 # ============================================================
@@ -12,242 +29,88 @@ if "authenticated" not in st.session_state:
 if not st.session_state.authenticated:
     st.set_page_config(page_title="Secure Access", page_icon="🔐")
     password = st.text_input("Enter Password", type="password")
-    if password == st.secrets["APP_PASSWORD"]:
+    if "APP_PASSWORD" in st.secrets and password == st.secrets["APP_PASSWORD"]:
         st.session_state.authenticated = True
-        st.rerun()
+        st.experimental_rerun()
     else:
         st.stop()
 
 # ============================================================
-# 🖥 PAGE CONFIG
+# ⚙ SETUP PHASE
 # ============================================================
 
-st.set_page_config(page_title="Architecture Strategy Simulator", page_icon="🏗")
-
-# ============================================================
-# 🎨 CUSTOM PROFESSIONAL DARK UI (BRIGHT TITLES / HEADERS)
-# ============================================================
-
-st.markdown("""
-<style>
-
-[data-testid="stAppViewContainer"] {
-    background-color: #1b1f28; /* slightly lighter dark background */
-}
-
-.block-container {
-    padding-top: 2rem;
-    max-width: 1100px;
-}
-
-/* All card headers, titles, subheaders, and category labels bright like tagline */
-h1, h2, h3, h4, h5, h6, p, sub, label {
-    color: #f5f7fa !important; /* match tagline brightness */
-    font-weight: 500;
-}
-
-/* Simulation / card containers */
-.sim-card {
-    background-color: #272b36; /* slightly lighter dark for contrast */
-    padding: 25px;
-    border-radius: 12px;
-    border: 1px solid #3b3f4d;
-    margin-bottom: 25px;
-}
-
-/* Section headers within cards */
-.sim-card h3 {
-    border-bottom: 2px solid #2ea043;
-    padding-bottom: 5px;
-    margin-bottom: 15px;
-}
-
-/* Buttons */
-.stButton>button {
-    background-color: #238636;
-    color: #ffffff;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-weight: 600;
-    border: none;
-}
-
-.stButton>button:hover {
-    background-color: #2ea043;
-}
-
-/* Info boxes */
-[data-testid="stInfo"] {
-    background-color: #2b303a;
-    border: 1px solid #3a3f4d;
-}
-
-/* Chat messages spacing */
-[data-testid="stChatMessage"] {
-    margin-bottom: 15px;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-# ============================================================
-# 🏗 HEADER SECTION
-# ============================================================
-
-st.markdown("""
-<div class="sim-card">
-    <h1>🏗 Architecture Strategy Simulator</h1>
-    <p>
-    Think like a Senior Data Architect. Design. Defend. Optimize.
-    </p>
-</div>
-""", unsafe_allow_html=True)
-
-# ============================================================
-# 🧠 SESSION STATE
-# ============================================================
-
-for key in ["setup_complete", "user_message_count",
-            "feedback_shown", "chat_complete", "messages"]:
-    if key not in st.session_state:
-        st.session_state[key] = False if key != "messages" else []
-
-if "user_message_count" not in st.session_state:
-    st.session_state.user_message_count = 0
-
-# ============================================================
-# 🔧 HELPER FUNCTIONS
-# ============================================================
-
-def complete_setup():
-    st.session_state.setup_complete = True
-
-def show_feedback():
-    st.session_state.feedback_shown = True
-
-# ============================================================
-# ⚙ SCENARIO SETUP
-# ============================================================
-
-st.markdown('<div class="sim-card">', unsafe_allow_html=True)
-st.subheader("⚙ Scenario Configuration")
-
-industry = st.selectbox("Industry",
-                        ("E-commerce", "Healthcare", "FinTech", "Media", "Manufacturing"),
-                        index=0)
-
-company_size = st.selectbox("Company Size",
-                            ("Startup", "Mid-size", "Enterprise"),
-                            index=0)
-
-cloud = st.selectbox("Cloud Provider",
-                     ("AWS", "Azure", "GCP"),
-                     index=0)
-
-workload = st.selectbox("Primary Workload",
-                        ("BI / Reporting", "Machine Learning",
-                         "Real-time Streaming", "BI + ML"),
-                        index=0)
-
-budget = st.selectbox("Budget Sensitivity",
-                      ("High (Cost sensitive)", "Medium", "Low (Performance first)"),
-                      index=0)
-
-# Persist scenario selections after clicking the button
-if st.button("Start Simulation") or st.session_state.setup_complete:
-    st.session_state.industry = industry
-    st.session_state.company_size = company_size
-    st.session_state.cloud = cloud
-    st.session_state.workload = workload
-    st.session_state.budget = budget
-    st.session_state.setup_complete = True
-
-    # Display confirmation / next step
-    st.success(f"Simulation started for a {company_size} {industry} company on {cloud}")
-    st.write("You can now start describing your architecture design below!")
-
-st.markdown('</div>', unsafe_allow_html=True)
-
-# ============================================================
-# 🎯 SIMULATION PHASE
-# ============================================================
-
-if (st.session_state.setup_complete
-    and not st.session_state.feedback_shown
-    and not st.session_state.chat_complete):
-
-    st.markdown("""
-    <div class="sim-card">
-        <h3>🎯 Simulation Active</h3>
-        <p>
-        You are the Data Architect. The AI is the CTO challenging your design.
-        Consider scalability, cost, governance, and ML readiness.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-    model_name = "gpt-4o-mini"
-
-    if not st.session_state.messages:
-        st.session_state.messages = [{
-            "role": "system",
-            "content": (
-                f"You are the CTO of a {st.session_state.company_size} "
-                f"{st.session_state.industry} company operating on {st.session_state.cloud}. "
-                f"The company prioritizes {st.session_state.workload} workloads "
-                f"and has {st.session_state.budget} budget sensitivity. "
-                f"Describe a realistic business problem first. "
-                f"Then ask the Data Architect to design the full data architecture. "
-                f"After each answer, challenge their design with concerns about "
-                f"cost, scalability, governance, compliance, reliability, and tradeoffs."
-            )
-        }]
-
-    for msg in st.session_state.messages:
-        if msg["role"] != "system":
-            with st.chat_message(msg["role"]):
-                st.markdown(msg["content"])
-
-    if st.session_state.user_message_count < 6:
-
-        if prompt := st.chat_input("Describe your architecture design...", max_chars=1500):
-
-            st.session_state.messages.append({"role": "user", "content": prompt})
-
-            with st.chat_message("user"):
-                st.markdown(prompt)
-
-            with st.chat_message("assistant"):
-                stream = client.chat.completions.create(
-                    model=model_name,
-                    messages=st.session_state.messages,
-                    stream=True,
-                )
-                response = st.write_stream(stream)
-
-            st.session_state.messages.append({"role": "assistant", "content": response})
-            st.session_state.user_message_count += 1
-
-    if st.session_state.user_message_count >= 6:
-        st.session_state.chat_complete = True
-
-# ============================================================
-# 📊 FEEDBACK BUTTON
-# ============================================================
-
-if st.session_state.chat_complete and not st.session_state.feedback_shown:
-    if st.button("Get Architecture Evaluation"):
-        show_feedback()
-
-# ============================================================
-# 📝 FEEDBACK SECTION
-# ============================================================
-
-if st.session_state.feedback_shown:
+if not st.session_state.setup_complete:
 
     st.markdown('<div class="sim-card">', unsafe_allow_html=True)
-    st.subheader("📊 Architecture Evaluation")
+    st.subheader("⚙ Business Process Configuration")
+
+    business_process = st.text_area(
+        "Describe the business process you want to model",
+        placeholder="Example: Students use meal cards at campus food locations..."
+    )
+
+    grain = st.text_input(
+        "Define the grain (the atomic level of the fact table)",
+        placeholder="Example: One row per student per food location per day"
+    )
+
+    source_tables = st.text_area(
+        "List your source tables",
+        placeholder="Example: Student, Campus_Food, Meal_Card_Transactions..."
+    )
+
+    kpis = st.text_area(
+        "List the KPIs or measures you care about",
+        placeholder="Example: Daily balance, total spend, number of swipes..."
+    )
+
+    # ⭐ NEW: Evaluation Mode Toggle
+    evaluation_mode = st.checkbox(
+        "Enable Evaluation Mode (Optional)",
+        value=False
+    )
+
+    if st.button("Start Modeling"):
+        st.session_state.business_process = business_process
+        st.session_state.grain = grain
+        st.session_state.source_tables = source_tables
+        st.session_state.kpis = kpis
+        st.session_state.evaluation_mode = evaluation_mode
+        st.session_state.setup_complete = True
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# ============================================================
+# 🌟 AFTER SETUP — placeholder to avoid blank page
+# ============================================================
+
+if st.session_state.setup_complete:
+    st.markdown('<div class="sim-card">', unsafe_allow_html=True)
+    st.subheader("✅ Setup Complete")
+    st.write("You have defined your business process, grain, source tables, and KPIs.")
+    st.write("Now you can continue your dimensional modeling or enable Evaluation Mode for feedback.")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# ============================================================
+# 📊 FEEDBACK BUTTON (Only if Evaluation Mode is ON)
+# ============================================================
+
+if (
+    st.session_state.chat_complete
+    and not st.session_state.feedback_shown
+    and st.session_state.evaluation_mode
+):
+    if st.button("Get Dimensional Model Evaluation"):
+        st.session_state.feedback_shown = True
+
+# ============================================================
+# 📝 FEEDBACK SECTION (Only if Evaluation Mode is ON)
+# ============================================================
+
+if st.session_state.feedback_shown and st.session_state.evaluation_mode:
+
+    st.markdown('<div class="sim-card">', unsafe_allow_html=True)
+    st.subheader("📊 Dimensional Model Evaluation")
 
     conversation_history = "\n".join(
         [f"{m['role']}: {m['content']}"
@@ -262,15 +125,15 @@ if st.session_state.feedback_shown:
             {
                 "role": "system",
                 "content": """
-You are a Senior Enterprise Data Architect evaluating a proposed architecture.
+You are a Principal Data Architect evaluating a dimensional model.
 
 Score 1–10 based on:
-- Scalability
-- Cost efficiency
-- Security & governance
-- Cloud-native design
-- ML readiness
-- Tradeoff clarity
+- Grain correctness
+- Additivity correctness
+- Conformed dimension design
+- SCD strategy
+- Business alignment
+- Simplicity vs completeness
 
 Format exactly:
 
@@ -293,7 +156,7 @@ Do not ask additional questions.
             },
             {
                 "role": "user",
-                "content": f"Evaluate this architecture discussion:\n{conversation_history}"
+                "content": f"Evaluate this dimensional modeling discussion:\n{conversation_history}"
             }
         ]
     )
