@@ -74,16 +74,25 @@ if not st.session_state.setup_complete:
         st.session_state.evaluation_mode = evaluation_mode
         st.session_state.setup_complete = True
 
-        # Call AI immediately for basic analysis
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# ============================================================
+# 📊 DISPLAY AI DIMENSIONAL MODEL SUMMARY
+# ============================================================
+
+if st.session_state.setup_complete:
+
+    # Only call AI once, if not already done
+    if not st.session_state.ai_response:
         client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
         prompt = f"""
 You are a Principal Data Architect. 
 Given the following inputs:
 
-Business Process: {business_process}
-Grain: {grain}
-Source Tables: {source_tables}
-KPIs: {kpis}
+Business Process: {st.session_state.business_process}
+Grain: {st.session_state.grain}
+Source Tables: {st.session_state.source_tables}
+KPIs: {st.session_state.kpis}
 
 Provide a clear summary of a dimensional model design: facts, dimensions, and any obvious observations or recommendations.
 Respond concisely.
@@ -94,16 +103,9 @@ Respond concisely.
         )
         st.session_state.ai_response = response.choices[0].message.content
 
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# ============================================================
-# 📊 DISPLAY AI RESPONSE
-# ============================================================
-
-if st.session_state.setup_complete:
     st.markdown('<div class="sim-card">', unsafe_allow_html=True)
     st.subheader("📊 Dimensional Model Summary")
-    st.write(st.session_state.ai_response or "✅ Setup Complete. Your AI response will appear here after clicking Start Modeling.")
+    st.write(st.session_state.ai_response)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ============================================================
