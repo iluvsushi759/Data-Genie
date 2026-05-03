@@ -30,22 +30,32 @@ conn.commit()
 # 🌲 PINECONE (VECTOR SEARCH ONLY)
 # ============================================================
 
-pc = Pinecone(api_key=st.secrets["PINECONE_API_KEY"])
+def get_pinecone_index():
 
-INDEX_NAME = "data-architect-projects"
+    pinecone_key = st.secrets.get("PINECONE_API_KEY")
 
-if INDEX_NAME not in [i.name for i in pc.list_indexes()]:
-    pc.create_index(
-        name=INDEX_NAME,
-        dimension=1536,
-        metric="cosine",
-        spec=ServerlessSpec(
-            cloud="aws",
-            region="us-east-1"
+    if not pinecone_key:
+        st.error("Missing PINECONE_API_KEY in Streamlit Secrets")
+        st.stop()
+
+    pc = Pinecone(api_key=pinecone_key)
+
+    INDEX_NAME = "data-architect-projects"
+
+    if INDEX_NAME not in [i.name for i in pc.list_indexes()]:
+        pc.create_index(
+            name=INDEX_NAME,
+            dimension=1536,
+            metric="cosine",
+            spec=ServerlessSpec(
+                cloud="aws",
+                region="us-east-1"
+            )
         )
-    )
 
-index = pc.Index(INDEX_NAME)
+    return pc.Index(INDEX_NAME)
+
+index = get_pinecone_index()
 
 # ============================================================
 # 🔐 SESSION STATE
