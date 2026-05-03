@@ -7,7 +7,7 @@ import sqlite3
 import json
 
 # ============================================================
-# 🗄️ SQLITE (SYSTEM OF RECORD)
+# SQLITE (SYSTEM OF RECORD)
 # ============================================================
 
 conn = sqlite3.connect("projects.db", check_same_thread=False)
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS projects (
 conn.commit()
 
 # ============================================================
-# 🌲 PINECONE (VECTOR SEARCH ONLY)
+# PINECONE (VECTOR SEARCH ONLY)
 # ============================================================
 
 def get_pinecone_index():
@@ -58,7 +58,7 @@ def get_pinecone_index():
 index = get_pinecone_index()
 
 # ============================================================
-# 🔐 SESSION STATE
+# SESSION STATE
 # ============================================================
 
 defaults = {
@@ -71,7 +71,7 @@ for k, v in defaults.items():
         st.session_state[k] = v
 
 # ============================================================
-# 🔑 AUTH
+# AUTH
 # ============================================================
 
 if "authenticated" not in st.session_state:
@@ -88,7 +88,7 @@ if not st.session_state.authenticated:
         st.stop()
 
 # ============================================================
-# 🔧 HELPERS
+#  HELPERS
 # ============================================================
 
 def get_embedding(text):
@@ -109,7 +109,7 @@ KPIs: {kpis}
 """
 
 # ============================================================
-# 🗄️ SAVE PROJECT (SQLITE + PINECONE)
+# SAVE PROJECT (SQLITE + PINECONE)
 # ============================================================
 
 def save_project(name, bp, grain, tables, kpis, ai_response):
@@ -143,7 +143,7 @@ def save_project(name, bp, grain, tables, kpis, ai_response):
     ])
 
 # ============================================================
-# 📂 LOAD PROJECT (TRUE RESUME = SQLITE)
+# LOAD PROJECT (TRUE RESUME = SQLITE)
 # ============================================================
 
 def load_project(project_name):
@@ -168,7 +168,7 @@ def load_project(project_name):
     return None
 
 # ============================================================
-# 🔍 SEMANTIC SEARCH (PINECONE)
+#  SEMANTIC SEARCH (PINECONE)
 # ============================================================
 
 def search_projects(query):
@@ -219,13 +219,13 @@ if not st.session_state.setup_complete:
         st.session_state.setup_complete = True
 
 # ============================================================
-# 🧠 MEMORY MODE (RAG)
+# MEMORY MODE (RAG)
 # ============================================================
 
 memory_mode = st.checkbox("Memory Mode (RAG)")
 
 # ============================================================
-# 📊 MODEL GENERATION
+# MODEL GENERATION
 # ============================================================
 
 if st.session_state.setup_complete:
@@ -273,7 +273,7 @@ Design a dimensional model.
     st.write(st.session_state.ai_response)
 
 # ============================================================
-# 💾 SAVE UI
+# SAVE UI
 # ============================================================
 
 project_name = st.text_input("Save project name")
@@ -290,7 +290,7 @@ if st.button("Save Project"):
     st.success("Saved to SQLite + indexed in Pinecone!")
 
 # ============================================================
-# 📂 RESUME PROJECT (REAL MEMORY = SQLITE)
+# RESUME PROJECT (REAL MEMORY = SQLITE)
 # ============================================================
 
 st.subheader("📂 Resume Project")
@@ -317,7 +317,7 @@ if st.button("Load Project"):
         st.rerun()
 
 # ============================================================
-# 🔍 SEMANTIC SEARCH (OPTIONAL)
+#  SEMANTIC SEARCH (OPTIONAL)
 # ============================================================
 
 search_query = st.text_input("Semantic search projects")
