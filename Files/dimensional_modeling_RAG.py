@@ -108,7 +108,6 @@ Source Tables: {tables}
 KPIs: {kpis}
 """
 
-
 # ============================================================
 # 🗄️ SAVE PROJECT (SQLITE + PINECONE)
 # ============================================================
@@ -117,7 +116,6 @@ def save_project(name, bp, grain, tables, kpis, ai_response):
 
     project_id = str(uuid.uuid4())
 
-    # ---- SQLITE (truth storage)
     cursor.execute("""
         INSERT INTO projects VALUES (?, ?, ?, ?, ?, ?, ?)
     """, (
@@ -131,7 +129,6 @@ def save_project(name, bp, grain, tables, kpis, ai_response):
     ))
     conn.commit()
 
-    # ---- PINECONE (semantic index only)
     embedding = get_embedding(build_text(bp, grain, tables, kpis))
 
     index.upsert([
@@ -144,7 +141,6 @@ def save_project(name, bp, grain, tables, kpis, ai_response):
             "ai_response": ai_response
         })
     ])
-
 
 # ============================================================
 # 📂 LOAD PROJECT (TRUE RESUME = SQLITE)
@@ -171,7 +167,6 @@ def load_project(project_name):
 
     return None
 
-
 # ============================================================
 # 🔍 SEMANTIC SEARCH (PINECONE)
 # ============================================================
@@ -188,7 +183,6 @@ def search_projects(query):
 
     return results.get("matches", [])
 
-
 # ============================================================
 # ⚙ SETUP
 # ============================================================
@@ -197,10 +191,25 @@ if not st.session_state.setup_complete:
 
     st.subheader("⚙ Model Setup")
 
-    business_process = st.text_area("Business Process")
-    grain = st.text_input("Grain")
-    source_tables = st.text_area("Source Tables")
-    kpis = st.text_area("KPIs")
+    business_process = st.text_area(
+        "Business Process",
+        placeholder="Example: Students use meal cards at campus food locations..."
+    )
+
+    grain = st.text_input(
+        "Grain",
+        placeholder="Example: One row per student per food location per day"
+    )
+
+    source_tables = st.text_area(
+        "Source Tables",
+        placeholder="Example: Student, Campus_Food, Meal_Card_Transactions..."
+    )
+
+    kpis = st.text_area(
+        "KPIs",
+        placeholder="Example: Daily balance, total spend, number of swipes..."
+    )
 
     if st.button("Start Modeling"):
         st.session_state.business_process = business_process
