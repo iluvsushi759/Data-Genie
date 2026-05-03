@@ -1,8 +1,8 @@
-Data_architect.py is a sample data Architecture challenge to yourself.  Describe your architecture and a model to OpenAI gpt 4-mini will be used.
+**Data_architect.py** is a sample data Architecture challenge to yourself.  Describe your architecture and a model to OpenAI gpt 4-mini will be used.
 This model will respond to by challenging things you might have not thought about or might have missed.
 Deploy this to gitHub and connect your GitHub account to Streamlit IO.
 
-Dimensional_modeling.py is a tool that will assist you creating your....... you guessed it, Data Modeling!  Obviously, this modeling model, shouldn't replace your ER diagram but this is a tool that can make us, DataWarehouse / Data / ML Architects, more efficient or help us with a particular we may have overlooked.  This model also uses gpt 40mini.  If you want, you can always downgrade them to gpt 3.5 turbo to lower your token cost. 
+**Dimensional_modeling.py** is a tool that will assist you creating your....... you guessed it, Data Modeling!  Obviously, this modeling model, shouldn't replace your ER diagram but this is a tool that can make us, DataWarehouse / Data / ML Architects, more efficient or help us with a particular we may have overlooked. It should be used in the conceptual phase.  You'll still need to do the logical and physical phase after using this. This model also uses gpt 40mini.  If you want, you can always downgrade them to gpt 3.5 turbo to lower your token cost. 
 
 So below is sample of how it can be used:
 
@@ -46,10 +46,17 @@ Please suggest:
 
 6️⃣ **Evaluation Mode**  
 When enabled, the AI will not just record your inputs, it will also review and score your dimensional modeling decisions, providing feedback on things like grain correctness, KPIs, conformed dimension design, and overall business alignment.  
-
+  
 If you leave it disabled, the app simply collects your inputs (business process, grain, source tables, KPIs) so you can focus on building your model without being “graded” or challenged.
-
+  
 Passwords should be stored in your secrets.toml but I've set it to gitignore.  Also don't forget to set your passwords in Streamlit IO.
-Also do NOT put in any data in there.  Just fill in your DDLs and metadata is all you need.
+Also do NOT put in any data in there.  Just fill in your DDLs and metadata is all you need.  
+  
+**Dimensional_modeling_RAG.py** ->  I've improved the Dimensional_modeling.py to use "memorization" and Retrieval Augemented Generative and semantic search with this version.  It will do this by enabling you to store your past projects into your PineCone embedding and into SQLite database (hosted via Streamlit). The RAG will be used when it will need to find similar past data models -> inject them into your prompt -> ask GPT to design a new one using that memory"  
+ - The Memory Mode option is for your RAG to be used.  It's like saying "Should I include past similar projects from Pinecone when I generate the answer?"  So check this off and then click on Start Modeling if you want to answers influenced by past similar objects.  
+- Save Project -> this enables you name this project you're working on and save it for later use.
+- You can Resume Project via selecing that project and then clicking Load Project.
+- Semantic search projects -> Performs a semantic search for your projects.  Example, "patients insurance analytics model"
+- **NOTE** --> instead of SQLite, for production, we should host it in PostGres or SQL Server.  Even though we can use Snowflake, it's not optimal since this app is going to be very OLTP-style behavior (transactional app pattern).  We don't woant unnecessary computer cost and over-engineer for simple CRUD.
 
 Have fun!
